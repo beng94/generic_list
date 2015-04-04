@@ -1,3 +1,6 @@
+#ifndef GLIST_H
+#define GLIST_H
+
 #include <stdlib.h>
 
 typedef struct glist
@@ -42,3 +45,5 @@ glist* glist_find(glist* root, void* data);
 glist* glist_find_custom(glist* root, void* data, gcompare cmp_func);
 int glist_position(glist* root, glist* item);
 int glist_index(glist* root, void* data);
+
+#endif

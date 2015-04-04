@@ -12,13 +12,11 @@ glist* glist_append(glist* root, void* data)
     new->next = NULL;
 
     if(root == NULL) return new;
-
     else
     {
-        glist *tmp = root;
-        while(tmp->next != NULL) tmp = tmp->next;
+        while(root->next != NULL) root = root->next;
 
-        tmp->next = new;
+        root->next = new;
     }
 
     return root;
@@ -35,20 +33,21 @@ glist* glist_prepend (glist* root, void* data)
 
 glist* glist_insert(glist* root, void* data, int id)
 {
-    //TODO: check glist_length -1 ?
-    if(id < 0 || id > glist_length(root))
-        root = glist_append(root, data);
+    if(id <=  0)
+        return glist_prepend(root, data);
+
+    if(id > glist_length(root))
+        return glist_append(root, data);
 
     else
     {
-        glist *tmp = root;
-        for(int i = 0; i<id; i++) tmp = tmp->next;
+        glist *prev = glist_nth(root, id-1);
 
         glist *new = glist_alloc();
         new->data = data;
-        new->next = tmp->next;
+        new->next = prev->next;
 
-        tmp->next = new;
+        prev->next = new;
     }
 
     return root;
@@ -56,17 +55,16 @@ glist* glist_insert(glist* root, void* data, int id)
 
 glist* glist_insert_before(glist* root, glist* sibling, void* data)
 {
-    glist* tmp = root;
-    while(tmp->next != sibling || tmp != NULL) tmp = tmp->next;
+    while(root->next != NULL && root->next != sibling) root = root->next;
 
-    if(tmp == NULL) root = glist_append(root, data);
+    if(root->next == NULL) root = glist_append(root, data);
     else
     {
         glist *new = glist_alloc();
         new->data = data;
         new->next = sibling;
 
-        tmp->next = new;
+        root->next = new;
     }
 
     return root;
@@ -215,20 +213,6 @@ glist* glist_first(glist* root)
     return root;
 }
 
-int glist_length(glist* root)
-{
-    glist* tmp = root;
-    int cnt = 0;
-
-    while(tmp != NULL)
-    {
-        tmp = tmp->next;
-        cnt++;
-    }
-
-    return cnt;
-}
-
 void* glist_nth_data (glist* root, int id)
 {
     if(id >= glist_length(root)) return NULL;
@@ -372,19 +356,33 @@ glist* glist_find(glist* root, void* data)
 {
     glist* out = NULL;
 
-    glist* ptr = root;
-    while(ptr != NULL)
+    while(root != NULL)
     {
-        if(ptr->data = data)
+        if(root->data == data)
         {
-            out = ptr;
+            out = root;
             break;
         }
-        ptr = ptr->next;
+        root = root->next;
     }
 
     return out;
 }
+
+int glist_length(glist* root)
+{
+    glist* tmp = root;
+    int cnt = 0;
+
+    while(tmp != NULL)
+    {
+        tmp = tmp->next;
+        cnt++;
+    }
+
+    return cnt;
+}
+
 
 glist* glist_find_custrom(glist* root, void* data, gcompare cmp_func)
 {

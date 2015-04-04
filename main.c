@@ -1,30 +1,13 @@
 #include "glist.h"
 #include <stdio.h>
+#include "test.h"
 
 int main()
 {
-    glist* root = NULL;
-
-    int a = 10;
-    int b = 20;
-    int c = 30;
-
-    root = glist_append(root, (void*)&a);
-    root = glist_append(root, (void*)&b);
-    root = glist_append(root, (void*)&c);
-
-    printf("%d\n", glist_length(root));
-
-    for(int i=0; i<5; i++)
-    {
-        int* tmp = glist_nth_data(root, i);
-        if(tmp == NULL) printf("NULL\n");
-        else
-        {
-            printf("%d\n", *tmp);
-        }
-    }
-
+    //tst_glist_append();
+    //tst_glist_prepend();
+    //tst_glist_insert();
+    tst_glist_insert_before();
 
     return 0;
 }
