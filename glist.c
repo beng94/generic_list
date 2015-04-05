@@ -14,9 +14,10 @@ glist* glist_append(glist* root, void* data)
     if(root == NULL) return new;
     else
     {
-        while(root->next != NULL) root = root->next;
+        glist* tmp = root;
+        while(tmp->next != NULL) tmp = tmp->next;
 
-        root->next = new;
+        tmp->next = new;
     }
 
     return root;
@@ -55,19 +56,23 @@ glist* glist_insert(glist* root, void* data, int id)
 
 glist* glist_insert_before(glist* root, glist* sibling, void* data)
 {
-    while(root->next != NULL && root->next != sibling) root = root->next;
+    if(sibling == root) return glist_prepend(root, data);
 
-    if(root->next == NULL) root = glist_append(root, data);
+    glist* tmp = root;
+    while(tmp->next != NULL && root->next != sibling)
+        tmp = tmp->next;
+
+    if(tmp->next == NULL) return glist_append(root, data);
     else
     {
         glist *new = glist_alloc();
         new->data = data;
         new->next = sibling;
 
-        root->next = new;
+        tmp->next = new;
     }
 
-    return root;
+    return tmp;
 }
 
 glist* glist_insert_sorted(glist* root, void* data, gcompare cmp)
@@ -91,18 +96,25 @@ glist* glist_remove(glist* root, void* data)
     {
         if(root->data == data)
         {
+            glist* next = root->next;
             free(root);
-            root = root->next;
+            root = next;
         }
         else
         {
             glist *tmp = root;
-            while(tmp->next->data != data && tmp->next->next != NULL)
+            while(tmp->next != NULL &&
+                  tmp->next->data != data)
                 tmp = tmp->next;
 
-            glist* del = tmp->next;
-            tmp->next = del->next;
-            free(del);
+            if(tmp->next->data == data)
+            {
+                glist* del = tmp->next;
+                tmp->next = del->next;
+                free(del);
+            }
+
+            else return root;
         }
     }
     return root;
@@ -113,14 +125,15 @@ glist* glist_remove_link(glist* root, glist* link)
     if(root == NULL) return root;
     else
     {
-        if(root->next == link)
+        if(root == link)
         {
-            root->next = link->next;
+            root = root->next;
         }
         else
         {
             glist *tmp = root;
-            while(tmp->next->next != link && tmp->next->next != NULL)
+            while(tmp->next != NULL &&
+                  tmp->next != link)
                 tmp = tmp->next;
 
             tmp->next = link->next;
@@ -135,15 +148,16 @@ glist* glist_delete_link(glist* root, glist* link)
     if(root == NULL) return root;
     else
     {
-        if(root->next == link)
+        if(root == link)
         {
-            root->next = link->next;
+            root = root->next;
             free(link);
         }
         else
         {
             glist *tmp = root;
-            while(tmp->next->next != link && tmp->next->next != NULL)
+            while(tmp->next != NULL &&
+                  tmp->next != link)
                 tmp = tmp->next;
 
             tmp->next = link->next;
@@ -167,16 +181,22 @@ glist* glist_remove_all(glist* root, void* data)
         }
 
         glist* tmp = root;
-        while(tmp->next->data == data && tmp->next != NULL)
+        while(tmp->next != NULL)
         {
-            tmp->next = tmp->next->next;
-            free(tmp->next);
+            if(tmp->next->data == data)
+            {
+                tmp->next = tmp->next->next;
+                free(tmp->next);
+            }
+
+            else tmp = tmp->next;
         }
     }
 
     return root;
 }
 
+//TODO: do sth with it
 void glist_free(glist* root)
 {
     glist* rm = root;
@@ -202,10 +222,11 @@ void glist_free_full (glist* root, gdestroy free_func)
 
 glist* glist_last(glist* root)
 {
-    glist *tmp = root;
-    while(tmp->next != NULL) tmp = tmp->next;
+    if(root == NULL) return NULL;
 
-    return tmp;
+    while(root->next != NULL) root = root->next;
+
+    return root;
 }
 
 glist* glist_first(glist* root)
@@ -215,14 +236,10 @@ glist* glist_first(glist* root)
 
 void* glist_nth_data (glist* root, int id)
 {
-    if(id >= glist_length(root)) return NULL;
-
-    glist* tmp = root;
-    for(int i = 0; i<id; i++) tmp = tmp->next;
-
-    return tmp->data;
+    return glist_nth(root, id)->data;
 }
 
+//TODO: make it NULL
 void glist_free_1(glist* item)
 {
     free(item);
@@ -232,11 +249,10 @@ glist* glist_copy(glist* root)
 {
     glist* new_root = NULL;
 
-    glist* ptr = root;
-    while(ptr != NULL)
+    while(root != NULL)
     {
-        new_root = glist_append(new_root, ptr->data);
-        ptr = ptr->next;
+        new_root = glist_append(new_root, root->data);
+        root = root->next;
     }
 
     return new_root;
@@ -259,10 +275,11 @@ glist* glist_copy_deep(glist* root, gcopy copy_func)
 
 glist* glist_nth(glist* root, int id)
 {
-    glist* tmp = root;
-    for(int i = 0; i<id; i++) tmp = tmp->next;
+     if(id >= glist_length(root) || id < 0) return NULL;
 
-    return tmp;
+    for(int i = 0; i<id; i++) root = root->next;
+
+    return root;
 }
 
 glist* glist_reverse(glist* root)
