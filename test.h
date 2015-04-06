@@ -15,5 +15,15 @@ int tst_glist_last();
 int tst_glist_nth_data();
 int tst_glist_copy();
 int tst_glist_nth();
+int tst_glist_reverse();
+int tst_glist_sort();
+int tst_glist_concat();
+int tst_glist_previous();
+int tst_glist_nth_prev();
+int tst_glist_find();
+int tst_glist_length();
+int tst_glist_find_custom();
+int tst_glist_position();
+int tst_glist_index();
 
 

@@ -306,15 +306,15 @@ glist* glist_sort(glist* root, gcompare cmp_func)
     glist* tmp_a = root;
     for(int i = 0; i<len; i++)
     {
-        glist* tmp_b = root;
-        for(int j = 0; j<len; j++)
+        glist* tmp_b = tmp_a->next;
+        for(int j = i + 1; j<len; j++)
         {
-            if(cmp_func(tmp_a->data, tmp_b->data))
+            if(cmp_func(tmp_a->data, tmp_b->data) > 0)
             {
                 void* chg = tmp_a->data;
                 tmp_a->data = tmp_b->data;
                 tmp_b->data = chg;
-            }
+                  }
             tmp_b = tmp_b->next;
         }
 
@@ -346,12 +346,12 @@ glist* glist_previous(glist* root, glist* item)
 {
     glist* out = NULL;
 
-    glist* ptr = root;
-    if(ptr == NULL) return out;
+    if(root == NULL || item == root) return out;
     else
     {
-        while(ptr->next != NULL || ptr->next != item) ptr = ptr->next;
-        if(ptr->next != NULL) out = ptr;
+        while(root->next != NULL && root->next != item)
+            root = root->next;
+        if(root->next != NULL) out = root;
     }
 
     return out;
@@ -364,7 +364,7 @@ glist* glist_next(glist* item)
 
 glist* glist_nth_prev(glist* root, int id)
 {
-    if(id <= 0) return NULL;
+    if(id <= 0 || id > glist_length(root)) return NULL;
 
     return glist_nth(root, id-1);
 }
@@ -401,7 +401,7 @@ int glist_length(glist* root)
 }
 
 
-glist* glist_find_custrom(glist* root, void* data, gcompare cmp_func)
+glist* glist_find_custom(glist* root, void* data, gcompare cmp_func)
 {
     glist* out = NULL;
 
@@ -424,13 +424,12 @@ int glist_position(glist* root, glist* item)
     int out = -1;
 
     int id = 0;
-    glist* ptr = root;
-    while(ptr != NULL)
+    while(root != NULL)
     {
-        if(ptr == item) return id;
+        if(root == item) return id;
 
         id++;
-        ptr = ptr->next;
+        root = root->next;
     }
 
     return out;
@@ -441,13 +440,12 @@ int glist_index(glist* root, void* data)
     int out = -1;
 
     int id = 0;
-    glist* ptr = root;
-    while(ptr != NULL)
+    while(root != NULL)
     {
-        if(ptr->data == data) return id;
+        if(root->data == data) return id;
 
         id++;
-        ptr = ptr->next;
+        root = root->next;
     }
 
     return out;

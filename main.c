@@ -18,6 +18,16 @@ int main()
     //tst_glist_nth_data();
     //tst_glist_copy();
     //tst_glist_nth();
+    //tst_glist_reverse();
+    //tst_glist_sort();
+    //tst_glist_concat();
+    //tst_glist_previous();
+    //tst_glist_nth_prev();
+    //tst_glist_find();
+    //tst_glist_length();
+    //tst_glist_find_custom();
+    //tst_glist_position();
+    tst_glist_index();
 
     return 0;
 }
