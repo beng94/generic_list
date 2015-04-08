@@ -222,7 +222,6 @@ int tst_glist_remove_all()
     return 1;
 }
 
-//TODO: it doesnt work
 int tst_glist_free()
 {
     int a = 1;
@@ -233,13 +232,14 @@ int tst_glist_free()
     root = glist_append(root, (void*)&a);
     root = glist_append(root, (void*)&b);
 
-    glist_free(root);
-    root = glist_append(root, (void*)&a);
+    glist_free(&root);
 
     printf("tst_glist_free\n");
     printf("expecte output: empty\n");
     if(root == NULL) printf("empty");
     else printf("not empty");
+
+    root = glist_append(root, (void*)&a);
 
     printf("\n%d\n", *(int*)(root->data));
 

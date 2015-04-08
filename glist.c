@@ -196,53 +196,48 @@ glist* glist_remove_all(glist* root, void* data)
     return root;
 }
 
-//TODO: do sth with it
-void glist_free(glist* root)
+void glist_free(glist** root)
 {
-    glist* rm = root;
-    while(rm != NULL)
+    while(*root != NULL)
     {
-        glist* next = rm->next;
-        free(rm);
-        rm = next;
+        glist* next = (*root)->next;
+        *root = NULL;
+        free(*root);
+        *root = next;
     }
 }
 
-void glist_free_full (glist* root, gdestroy free_func)
+//TODO: test it
+void glist_free_full (glist** root, gdestroy free_func)
 {
-    glist* rm = root;
-    while(rm != NULL)
+    while(*root != NULL)
     {
-        glist* next = rm->next;
-        free_func(rm->data);
-        free(rm);
-        rm = next;
+        glist* next = (*root)->next;
+        free_func((*root)->data);
+        *root = NULL;
+        free(*root);
+        *root = next;
     }
 }
 
-glist* glist_last(glist* root)
-{
-    if(root == NULL) return NULL;
-
-    while(root->next != NULL) root = root->next;
-
-    return root;
-}
-
-glist* glist_first(glist* root)
-{
-    return root;
-}
-
-void* glist_nth_data (glist* root, int id)
-{
-    return glist_nth(root, id)->data;
-}
-
-//TODO: make it NULL
 void glist_free_1(glist* item)
 {
+    item = NULL;
     free(item);
+}
+
+int glist_length(glist* root)
+{
+    glist* tmp = root;
+    int cnt = 0;
+
+    while(tmp != NULL)
+    {
+        tmp = tmp->next;
+        cnt++;
+    }
+
+    return cnt;
 }
 
 glist* glist_copy(glist* root)
@@ -271,15 +266,6 @@ glist* glist_copy_deep(glist* root, gcopy copy_func)
     }
 
     return new_root;
-}
-
-glist* glist_nth(glist* root, int id)
-{
-     if(id >= glist_length(root) || id < 0) return NULL;
-
-    for(int i = 0; i<id; i++) root = root->next;
-
-    return root;
 }
 
 glist* glist_reverse(glist* root)
@@ -342,6 +328,21 @@ void glist_foreach(glist* root, gfunc func, void* usr_data)
     }
 }
 
+glist* glist_last(glist* root)
+{
+    if(root == NULL) return NULL;
+
+    while(root->next != NULL) root = root->next;
+
+    return root;
+}
+
+glist* glist_first(glist* root)
+{
+    return root;
+}
+
+
 glist* glist_previous(glist* root, glist* item)
 {
     glist* out = NULL;
@@ -360,6 +361,20 @@ glist* glist_previous(glist* root, glist* item)
 glist* glist_next(glist* item)
 {
     return item->next;
+}
+
+glist* glist_nth(glist* root, int id)
+{
+     if(id >= glist_length(root) || id < 0) return NULL;
+
+    for(int i = 0; i<id; i++) root = root->next;
+
+    return root;
+}
+
+void* glist_nth_data (glist* root, int id)
+{
+    return glist_nth(root, id)->data;
 }
 
 glist* glist_nth_prev(glist* root, int id)
@@ -386,21 +401,6 @@ glist* glist_find(glist* root, void* data)
     return out;
 }
 
-int glist_length(glist* root)
-{
-    glist* tmp = root;
-    int cnt = 0;
-
-    while(tmp != NULL)
-    {
-        tmp = tmp->next;
-        cnt++;
-    }
-
-    return cnt;
-}
-
-
 glist* glist_find_custom(glist* root, void* data, gcompare cmp_func)
 {
     glist* out = NULL;
@@ -415,7 +415,6 @@ glist* glist_find_custom(glist* root, void* data, gcompare cmp_func)
         }
         ptr = ptr->next;
     }
-
     return out;
 }
 
