@@ -13,10 +13,13 @@ int main()
     //tst_glist_remove_link();
     //tst_glist_delete_link();
     //tst_glist_remove_all();
-    tst_glist_free(); //TODO: fix it
+    //tst_glist_free();
+    //tst_glist_first();
     //tst_glist_last();
     //tst_glist_nth_data();
     //tst_glist_copy();
+    //tst_glist_copy_deep();
+    //tst_glist_next();
     //tst_glist_nth();
     //tst_glist_reverse();
     //tst_glist_sort();

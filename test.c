@@ -172,7 +172,6 @@ int tst_glist_remove_link()
 
 int tst_glist_delete_link()
 {
-    //TODO: should check whether the memery is freed
     int a = 1;
     int b = 2;
 
@@ -246,41 +245,20 @@ int tst_glist_free()
     return 1;
 }
 
-int tst_glist_last()
+int tst_glist_length()
 {
     int a = 1;
     int b = 2;
-
-    glist* root= NULL;
-    root = glist_append(root, (void*)&a);
-    root = glist_append(root, (void*)&a);
-    root = glist_append(root, (void*)&b);
-
-    printf("tst_glist_last:\n");
-    printf("expected output: 2\n");
-    printf("%d",  *(int*)glist_last(root)->data);
-
-    root = glist_append(root, (void*)&a);
-
-    return 1;
-}
-
-int tst_glist_nth_data()
-{
-    int a = 1;
-    int b = 2;
-    int c = 3;
 
     glist* root = NULL;
+    int len_a = glist_length(root);
     root = glist_append(root, (void*)&a);
     root = glist_append(root, (void*)&b);
-    root = glist_append(root, (void*)&c);
+    int len_b = glist_length(root);
 
-    printf("tst_list_nth_data:\n");
-    printf("expected output: 1 2 3\n");
-    printf("%d %d %d", *(int*)glist_nth_data(root, 0),
-                       *(int*)glist_nth_data(root, 1),
-                       *(int*)glist_nth_data(root, 2));
+    printf("tst_glist_length\n");
+    printf("expected output: 0 2\n");
+    printf("%d %d", len_a, len_b);
 
     return 1;
 }
@@ -310,31 +288,38 @@ int tst_glist_copy()
     return 1;
 }
 
-//TODO: cannot check until free functions checked
-int tst_glist_copy_deep() { return 1;}
 
-int tst_glist_nth()
+static void* copy(void* data)
+{
+    int* old = (int*)data;
+
+    int* new = (int*)malloc(sizeof(int));
+    *new = *old;
+
+    return (void*)new;
+}
+
+//TODO: cannot check until free functions checked
+int tst_glist_copy_deep()
 {
     int a = 1;
     int b = 2;
-    int c = 3;
 
     glist* root = NULL;
     root = glist_append(root, (void*)&a);
     root = glist_append(root, (void*)&b);
-    root = glist_append(root, (void*)&c);
 
-    printf("tst_glist_nth\n");
-    printf("expected output: 1 2 3\n");
-    printf("%d %d %d", *(int*)glist_nth(root, 0)->data,
-                       *(int*)glist_nth(root, 1)->data,
-                       *(int*)glist_nth(root, 2)->data);
+    glist* new = glist_copy_deep(root, copy);
 
-    root = glist_append(root, (void*)&a);
-    while(root != NULL)
+    glist_free(&root);
+
+    printf("tst_glist_copy_deep\n");
+    printf("expected output: 1 2\n");
+
+    while(new != NULL)
     {
-        printf("%d ", *(int*)root->data);
-        root = root->next; //modifies the list
+        printf("%d ", *(int*)new->data);
+        new = new->next; //modifies the list
     }
 
     return 1;
@@ -454,6 +439,43 @@ int tst_glist_foreach()
     return 1;
 }
 
+int tst_glist_first()
+{
+    int a = 1;
+    int b = 2;
+
+    glist* root = NULL;
+    root = glist_append(root, (void*)&a);
+    root = glist_append(root, (void*)&b);
+
+    printf("tst_glist_first\n");
+    printf("expected output: 1\n");
+
+    printf("%d",*(int*)(glist_first(root)->data));
+
+    return 1;
+}
+
+int tst_glist_last()
+{
+    int a = 1;
+    int b = 2;
+
+    glist* root= NULL;
+    root = glist_append(root, (void*)&a);
+    root = glist_append(root, (void*)&a);
+    root = glist_append(root, (void*)&b);
+
+    printf("tst_glist_last:\n");
+    printf("expected output: 2\n");
+    printf("%d",  *(int*)glist_last(root)->data);
+
+    root = glist_append(root, (void*)&a);
+
+    return 1;
+}
+
+
 int tst_glist_previous()
 {
     int a = 1;
@@ -469,6 +491,71 @@ int tst_glist_previous()
     printf("%d ", *(int*)glist_previous(root, root->next)->data);
     if(glist_previous(root, root) == NULL) printf("NULL");
     else printf("not NULL");
+
+    return 1;
+}
+
+int tst_glist_next()
+{
+    int a = 1;
+    int b = 2;
+
+    glist* root = NULL;
+    root = glist_append(root, (void*)&a);
+    root = glist_append(root, (void*)&b);
+
+    printf("tst_glist_next\n");
+    printf("expected output: 2\n");
+
+    printf("%d", *(int*)(glist_next(root)->data));
+
+
+    return 1;
+}
+
+int tst_glist_nth()
+{
+    int a = 1;
+    int b = 2;
+    int c = 3;
+
+    glist* root = NULL;
+    root = glist_append(root, (void*)&a);
+    root = glist_append(root, (void*)&b);
+    root = glist_append(root, (void*)&c);
+
+    printf("tst_glist_nth\n");
+    printf("expected output: 1 2 3\n");
+    printf("%d %d %d", *(int*)glist_nth(root, 0)->data,
+                       *(int*)glist_nth(root, 1)->data,
+                       *(int*)glist_nth(root, 2)->data);
+
+    root = glist_append(root, (void*)&a);
+    while(root != NULL)
+    {
+        printf("%d ", *(int*)root->data);
+        root = root->next; //modifies the list
+    }
+
+    return 1;
+}
+
+int tst_glist_nth_data()
+{
+    int a = 1;
+    int b = 2;
+    int c = 3;
+
+    glist* root = NULL;
+    root = glist_append(root, (void*)&a);
+    root = glist_append(root, (void*)&b);
+    root = glist_append(root, (void*)&c);
+
+    printf("tst_list_nth_data:\n");
+    printf("expected output: 1 2 3\n");
+    printf("%d %d %d", *(int*)glist_nth_data(root, 0),
+                       *(int*)glist_nth_data(root, 1),
+                       *(int*)glist_nth_data(root, 2));
 
     return 1;
 }
@@ -511,24 +598,6 @@ int tst_glist_find()
     printf("%d ", *(int*)glist_find(root, (void*)&b)->data);
     if(glist_find(root, (void*)&c) == NULL) printf("NULL");
     else printf("not NULL");
-
-    return 1;
-}
-
-int tst_glist_length()
-{
-    int a = 1;
-    int b = 2;
-
-    glist* root = NULL;
-    int len_a = glist_length(root);
-    root = glist_append(root, (void*)&a);
-    root = glist_append(root, (void*)&b);
-    int len_b = glist_length(root);
-
-    printf("tst_glist_length\n");
-    printf("expected output: 0 2\n");
-    printf("%d %d", len_a, len_b);
 
     return 1;
 }

@@ -207,7 +207,6 @@ void glist_free(glist** root)
     }
 }
 
-//TODO: test it
 void glist_free_full (glist** root, gdestroy free_func)
 {
     while(*root != NULL)
